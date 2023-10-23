@@ -1,7 +1,7 @@
 # goitneo-python-hw-3-MCS3
 
 ### Sample console input for tests
-'''
+```
 add A 1234567890
 add B 1234567890
 add C 123456789
@@ -27,4 +27,4 @@ show-birthday C
 birthdays
 hello
 close
-'''
+```
