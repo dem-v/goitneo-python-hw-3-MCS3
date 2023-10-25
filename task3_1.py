@@ -239,13 +239,44 @@ def write_contact(contacts, args, is_change=False, *_):
 
     return f"Contact {name} {'changed' if is_change else 'added'}."
 
-
+@input_error
 def write_contact_add(contacts, args, *_):
-    return write_contact(contacts, args, False)
+    if len(args) != 2:
+        raise IndexError()
+    name, phone = args
 
+    rec = contacts.find(name)
+    if rec is not None:
+        raise KeyExistInContacts(name)
 
+    rec = Record(name)
+    a = rec.add_phone(phone)
+    if a is not None:
+        return a
+    contacts.add_record(rec)
+
+    return f"Contact {name} added."
+
+@input_error
 def write_contact_change(contacts, args, *_):
-    return write_contact(contacts, args, True)
+    if len(args) != 3:
+        raise IndexError()
+    name, phone_old, phone_new = args
+
+    rec = contacts.find(name)
+    if rec is None:
+        raise KeyNotExistInContacts(name)
+
+    if len(rec.phones) == 0:
+        return f"Contact {name} doesn't have phone numbers."
+    p = rec.find_phone(phone_old)
+    if p is None:
+        return f"Contact {name} doesn't have phone number {phone_old}."
+    a = rec.edit_phone(str(p), phone_new)
+    if a is not None:
+        return a
+
+    return f"Contact {name} updated."
 
 
 @input_error
@@ -334,7 +365,7 @@ def main():
         command, *args = parse_input(user_input)
 
         print(
-            OPERATIONS[command](book, args, True if command == "change" else False)
+            OPERATIONS[command](book, args)
         )
         if command in ["close", "exit"]:
             break
